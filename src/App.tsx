@@ -3,7 +3,6 @@ import type { Entry, Slot, Split } from './lib/types';
 import { computeStats } from './lib/types';
 import { loadEntries, saveEntries, uid } from './lib/store';
 import { useFileSync } from './hooks/useFileSync';
-import { useCloudSync } from './hooks/useCloudSync';
 import { Header } from './components/Header';
 import { Marquee } from './components/Marquee';
 import { BalanceHero } from './components/BalanceHero';
@@ -12,7 +11,6 @@ import { MealForm } from './components/MealForm';
 import { History } from './components/History';
 import { JsonPanel } from './components/JsonPanel';
 import { FileSyncBanner } from './components/FileSyncBanner';
-import { CloudSyncPanel } from './components/CloudSyncPanel';
 import { Footer } from './components/Footer';
 
 export default function App() {
@@ -24,9 +22,6 @@ export default function App() {
 
   /* real JSON file on disk — auto-save + auto-restore */
   const fileSync = useFileSync(entries, setEntries);
-
-  /* shared ledger across devices — realtime cloud sync */
-  const cloudSync = useCloudSync(entries, setEntries);
 
   const stats = useMemo(() => computeStats(entries), [entries]);
 
@@ -62,9 +57,8 @@ export default function App() {
         <BalanceHero stats={stats} onSettle={addSettle} />
         <Marquee />
 
-        {/* sync status — cloud (all devices) + disk file (this device) */}
+        {/* sync status — ledger file on disk */}
         <div className="mx-auto max-w-7xl space-y-3 px-4 pt-6 sm:px-6">
-          <CloudSyncPanel {...cloudSync} />
           <FileSyncBanner {...fileSync} />
         </div>
 
