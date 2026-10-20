@@ -1,7 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Database } from 'lucide-react';
 import type { Entry, Slot, Split } from './lib/types';
 import { computeStats } from './lib/types';
-import { loadEntries, saveEntries, uid } from './lib/store';
+import {
+  fetchBundledLedger,
+  hasStoredLedger,
+  localUpdatedAt,
+  loadEntries,
+  saveEntries,
+  uid,
+} from './lib/store';
+import { fetchDbLedger, pushDbLedger } from './lib/filedb';
 import { useFileSync } from './hooks/useFileSync';
 import { Header } from './components/Header';
 import { Marquee } from './components/Marquee';
@@ -15,10 +24,46 @@ import { Footer } from './components/Footer';
 
 export default function App() {
   const [entries, setEntries] = useState<Entry[]>(() => loadEntries());
+  const [booted, setBooted] = useState(false);
+  const [dbLive, setDbLive] = useState(false);
+  const pushTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  /* boot — the .json file IS the database:
+     1. dev server file endpoint → read public/duet-ledger.json from disk
+     2. static deploy → bundled duet-ledger.json if newer than this screen
+     3. otherwise → whatever this browser already holds */
   useEffect(() => {
+    let alive = true;
+    void (async () => {
+      const fromFile = await fetchDbLedger();
+      if (!alive) return;
+      if (fromFile !== null) {
+        setEntries(fromFile);
+        setDbLive(true);
+        setBooted(true);
+        return;
+      }
+      const bundled = await fetchBundledLedger();
+      if (!alive) return;
+      if (bundled && (!hasStoredLedger() || bundled.updatedAt > localUpdatedAt())) {
+        setEntries(bundled.entries);
+      }
+      setBooted(true);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  /* persist every change — file DB when live (browser storage stays as mirror) */
+  useEffect(() => {
+    if (!booted) return;
     saveEntries(entries);
-  }, [entries]);
+    if (dbLive) {
+      clearTimeout(pushTimer.current);
+      pushTimer.current = setTimeout(() => void pushDbLedger(entries), 300);
+    }
+  }, [entries, booted, dbLive]);
 
   /* real JSON file on disk — auto-save + auto-restore */
   const fileSync = useFileSync(entries, setEntries);
@@ -57,9 +102,27 @@ export default function App() {
         <BalanceHero stats={stats} onSettle={addSettle} />
         <Marquee />
 
-        {/* sync status — ledger file on disk */}
+        {/* sync status — the ledger .json file */}
         <div className="mx-auto max-w-7xl space-y-3 px-4 pt-6 sm:px-6">
-          <FileSyncBanner {...fileSync} />
+          {dbLive ? (
+            <section className="flex items-center gap-3.5 border border-sage/40 bg-card px-5 py-4">
+              <span className="grid size-10 shrink-0 place-items-center border border-sage/50 bg-sage/10 text-sage">
+                <Database className="size-4.5" strokeWidth={1.75} />
+              </span>
+              <div className="leading-tight">
+                <p className="flex items-center gap-2.5 font-display text-sm font-bold tracking-[0.14em]">
+                  FILE DATABASE LIVE
+                  <span className="size-1.5 animate-pulse rounded-full bg-sage" />
+                </p>
+                <p className="mt-1 font-mono text-[10px] tracking-wide text-cream-dim">
+                  reading and writing public/duet-ledger.json on disk — every change lands in the
+                  file instantly
+                </p>
+              </div>
+            </section>
+          ) : (
+            <FileSyncBanner {...fileSync} />
+          )}
         </div>
 
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">

@@ -9,36 +9,23 @@ export const uid = (): string =>
     ? crypto.randomUUID()
     : `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
-/** demo meals so the ledger tells a story on first launch */
-function seedEntries(): Entry[] {
-  const now = new Date();
-  const at = (daysAgo: number, h: number, m: number) => {
-    const d = new Date(now);
-    d.setDate(d.getDate() - daysAgo);
-    d.setHours(h, m, 0, 0);
-    return d.toISOString();
-  };
-  const seed: Array<Omit<MealEntry, 'id'>> = [
-    { kind: 'meal', at: at(2, 21, 40), slot: 'night', note: 'Chicken biryani + cold drinks', split: 'even', usman: 850, fasi: 0 },
-    { kind: 'meal', at: at(1, 11, 15), slot: 'break', note: 'Samosay + chai at canteen', split: 'even', usman: 0, fasi: 240 },
-    { kind: 'meal', at: at(0, 22, 5), slot: 'night', note: 'Shawarma night run', split: 'even', usman: 380, fasi: 320 },
-  ];
-  return seed.map((s) => ({ ...s, id: uid() }));
-}
-
 export function loadEntries(): Entry[] {
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) {
-      const fresh = seedEntries();
-      saveEntries(fresh);
-      return fresh;
-    }
+    if (!raw) return [];
     const data = JSON.parse(raw);
-    if (Array.isArray(data?.entries)) return data.entries as Entry[];
-    return seedEntries();
+    return Array.isArray(data?.entries) ? (data.entries as Entry[]) : [];
   } catch {
-    return seedEntries();
+    return [];
+  }
+}
+
+/** true when this browser already holds a saved ledger (even an empty one) */
+export function hasStoredLedger(): boolean {
+  try {
+    return localStorage.getItem(KEY) != null;
+  } catch {
+    return false;
   }
 }
 
@@ -113,4 +100,33 @@ export function parseImported(text: string): Entry[] {
     }
   }
   return clean;
+}
+
+/* ------------------------------------------------------------------ */
+/* bundled ledger — duet-ledger.json shipped with the deployed site   */
+/* ------------------------------------------------------------------ */
+export interface BundledLedger {
+  entries: Entry[];
+  updatedAt: number;
+}
+
+/**
+ * Fetches duet-ledger.json from the deployed site (the one in public/).
+ * Lets you keep the shared data in a plain .json file: update it in the
+ * repo, redeploy, and every screen adopts it on reload (newest wins).
+ */
+export async function fetchBundledLedger(): Promise<BundledLedger | null> {
+  try {
+    const res = await fetch('duet-ledger.json', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const raw = await res.text();
+    if (!raw.trim()) return null;
+    const parsed = JSON.parse(raw) as { updatedAt?: string };
+    const entries = parseImported(raw);
+    if (entries.length === 0) return null;
+    return { entries, updatedAt: Date.parse(parsed?.updatedAt ?? '') || 0 };
+  } catch {
+    /* file not deployed — local data stands on its own */
+    return null;
+  }
 }
