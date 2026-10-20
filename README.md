@@ -26,7 +26,7 @@ There is also an in-app **File Sync** panel (Chromium only): link a real `.json`
 
 ```bash
 npm install
-npm run dev        # http://localhost:5172 — writes to public/duet-ledger.json
+npm run dev        # http://localhost:5173 — writes to public/duet-ledger.json
 npm run build      # single-file dist/index.html
 node scripts/ledger-selfcheck.mjs   # tests for the Vercel function
 ```
