@@ -115,7 +115,7 @@ export default function App() {
                   <span className="size-1.5 animate-pulse rounded-full bg-sage" />
                 </p>
                 <p className="mt-1 font-mono text-[10px] tracking-wide text-cream-dim">
-                  reading and writing public/duet-ledger.json on disk — every change lands in the
+                  reading and writing the shared duet-ledger.json — every change lands in the
                   file instantly
                 </p>
               </div>
