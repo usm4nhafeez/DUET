@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import {
   AlertTriangle,
   FilePlus2,
@@ -27,12 +26,7 @@ export function FileSyncBanner(props: FileSync) {
           : 'border-line';
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      className={`border bg-card ${skin}`}
-    >
+    <section data-reveal className={`border bg-card ${skin}`}>
       <div className="flex flex-col gap-4 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
         {/* left — status copy */}
         <div className="flex items-start gap-3.5">
@@ -116,6 +110,6 @@ export function FileSyncBanner(props: FileSync) {
           )}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }

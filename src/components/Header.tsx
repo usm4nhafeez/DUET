@@ -1,12 +1,30 @@
-import { Coffee, Moon, UtensilsCrossed } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Coffee, Moon, MoonStar, Sun, UtensilsCrossed } from 'lucide-react';
 import { useNow } from '../hooks/useNow';
 import { fmtDateChip, pad2 } from '../lib/format';
 
-/** sticky top bar — brand + live weekday / date / time chip */
+/** sticky top bar — brand + live weekday / date / time chip + dark/light toggle */
 export function Header() {
   const now = useNow(1000);
   const hour = now.getHours();
   const isNight = hour >= 17 || hour < 5;
+
+  const [theme, setTheme] = useState<'dark' | 'light'>(() =>
+    document.documentElement.dataset.theme === 'light' ? 'light' : 'dark',
+  );
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('duet-theme', theme);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta)
+      meta.setAttribute(
+        'content',
+        getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#0b0906',
+      );
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-ink/80 backdrop-blur-md">
@@ -46,6 +64,19 @@ export function Header() {
             <span className="blink">:</span>
             {pad2(now.getSeconds())}
           </span>
+
+          <button
+            onClick={toggleTheme}
+            aria-label={`switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            className="grid size-9 place-items-center border border-line bg-paper text-cream-dim transition-colors hover:border-gold/60 hover:text-gold"
+          >
+            {theme === 'dark' ? (
+              <Sun className="size-4" strokeWidth={1.75} />
+            ) : (
+              <MoonStar className="size-4" strokeWidth={1.75} />
+            )}
+          </button>
         </div>
       </div>
     </header>

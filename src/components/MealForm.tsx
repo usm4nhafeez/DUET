@@ -64,19 +64,14 @@ export function MealForm({ onAdd }: Props) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      className="border border-line bg-card"
-    >
+    <div data-reveal="stagger" className="border border-line bg-card">
       {/* form header */}
       <div className="flex items-center justify-between border-b border-line px-5 py-4">
         <p className="flex items-center gap-2.5 font-mono text-[11px] font-semibold tracking-[0.28em] text-cream">
           <UtensilsCrossed className="size-4 text-gold" strokeWidth={1.75} />
           LOG A MEAL
         </p>
-        <span className="font-mono text-[9px] tracking-[0.2em] text-cream-dim/70">SAVED AS JSON</span>
+        <span className="font-mono text-[9px] tracking-[0.2em] text-cream-dim/90">SAVED AS JSON</span>
       </div>
 
       <div className="space-y-5 p-5">
@@ -194,7 +189,7 @@ export function MealForm({ onAdd }: Props) {
                     value={p === 'usman' ? usmanAmt : fasiAmt}
                     onChange={(e) => (p === 'usman' ? setUsmanAmt(e.target.value) : setFasiAmt(e.target.value))}
                     onKeyDown={(e) => e.key === 'Enter' && submit()}
-                    className="w-full bg-transparent font-mono text-xl font-semibold tabular-nums text-cream outline-none placeholder:text-cream-dim/40"
+                    className="w-full min-w-0 bg-transparent font-mono text-xl font-semibold tabular-nums text-cream outline-none placeholder:text-cream-dim/60"
                   />
                 </span>
               </label>
@@ -236,7 +231,7 @@ export function MealForm({ onAdd }: Props) {
         {/* note */}
         <div>
           <p className="mb-2 font-mono text-[9px] tracking-[0.28em] text-cream-dim">
-            MEAL DETAIL <span className="text-cream-dim/60">— OPTIONAL</span>
+            MEAL DETAIL <span className="text-cream-dim/80">— OPTIONAL</span>
           </p>
           <input
             type="text"
@@ -245,7 +240,7 @@ export function MealForm({ onAdd }: Props) {
             onKeyDown={(e) => e.key === 'Enter' && submit()}
             placeholder="anda paratha @ canteen…"
             maxLength={60}
-            className="w-full border border-line bg-paper px-4 py-3 font-mono text-sm text-cream outline-none placeholder:text-cream-dim/40 focus:border-gold/60"
+            className="w-full border border-line bg-paper px-4 py-3 font-mono text-sm text-cream outline-none placeholder:text-cream-dim/60 focus:border-gold/60"
           />
         </div>
 
@@ -259,6 +254,6 @@ export function MealForm({ onAdd }: Props) {
           LOG MEAL — {fmtMoney(total)}
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 }

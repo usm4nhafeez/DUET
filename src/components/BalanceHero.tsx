@@ -5,6 +5,7 @@ import type { LedgerStats, Person } from '../lib/types';
 import { PEOPLE } from '../lib/types';
 import { fmtMoney, fmtNum } from '../lib/format';
 import { useAnimatedNumber } from '../lib/useAnimatedNumber';
+import { HeroBackground } from './HeroBackground';
 
 interface Props {
   stats: LedgerStats;
@@ -22,7 +23,7 @@ function PersonChip({
 }) {
   const p = PEOPLE[person];
   return (
-    <div className="flex flex-1 items-center justify-between gap-3 border border-line bg-paper px-4 py-3">
+    <div className="flex flex-1 items-center justify-between gap-3 border border-line bg-paper px-4 py-3 lift">
       <div className="flex items-center gap-3">
         <span className="grid size-9 shrink-0 place-items-center border border-gold/40 bg-gold/10 font-display text-sm font-bold text-gold">
           {p.short}
@@ -91,10 +92,13 @@ export function BalanceHero({ stats, onSettle }: Props) {
 
   return (
     <section className="relative overflow-hidden border-b border-line">
+      {/* three.js gold dust — sits under the glow and all content */}
+      <HeroBackground />
       {/* ambient glow + backdrop word */}
       <div
+        data-hero-glow
         className="pointer-events-none absolute -top-40 left-1/2 h-130 w-200 -translate-x-1/2 rounded-full opacity-25"
-        style={{ background: 'radial-gradient(closest-side, rgba(240,184,74,0.35), transparent)' }}
+        style={{ background: 'radial-gradient(closest-side, var(--glow), transparent)' }}
       />
       <span className="outline-word pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 font-serif text-[22vw] italic leading-none">
         dinner
@@ -118,11 +122,11 @@ export function BalanceHero({ stats, onSettle }: Props) {
           className="font-display"
         >
           {square ? (
-            <h1 className="text-[13vw] font-bold leading-[0.9] tracking-tight sm:text-8xl">
+            <h1 className="text-[13vw] font-bold leading-[0.9] tracking-tight sm:text-8xl lg:text-9xl">
               ALL <span className="font-serif font-normal italic text-gold">square.</span>
             </h1>
           ) : (
-            <h1 className="text-[13vw] font-bold leading-[0.9] tracking-tight sm:text-8xl">
+            <h1 className="text-[13vw] font-bold leading-[0.9] tracking-tight sm:text-8xl lg:text-9xl">
               {PEOPLE[debtor].tag}{' '}
               <span className="font-serif font-normal italic text-gold">owes</span>{' '}
               {PEOPLE[creditor].tag}
@@ -142,14 +146,14 @@ export function BalanceHero({ stats, onSettle }: Props) {
             <span className="ml-3 align-top font-mono text-lg tracking-[0.2em] text-cream-dim">PKR</span>
           </p>
           {!square && (
-            <p className="mb-1 font-mono text-[11px] leading-relaxed tracking-wide text-cream-dim">
+            <p className="mb-1 font-mono text-[12px] leading-relaxed tracking-wide text-cream-dim">
               {PEOPLE[debtor].name} covers the next bill,
               <br />
               or hands back {fmtMoney(Math.abs(balance))} to settle.
             </p>
           )}
           {square && (
-            <p className="mb-1 font-mono text-[11px] leading-relaxed tracking-wide text-cream-dim">
+            <p className="mb-1 font-mono text-[12px] leading-relaxed tracking-wide text-cream-dim">
               nobody owes anybody.
               <br />
               the table is clean — go eat.
@@ -166,7 +170,7 @@ export function BalanceHero({ stats, onSettle }: Props) {
         >
           <div className="relative h-14">
             <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-line" />
-            <div className="absolute left-1/2 top-1/2 h-6 w-px -translate-x-1/2 -translate-y-1/2 bg-cream-dim/50" />
+            <div className="absolute left-1/2 top-1/2 h-6 w-px -translate-x-1/2 -translate-y-1/2 bg-cream-dim/70" />
             <div
               className="absolute top-1/2 h-4 w-px -translate-x-1/2 -translate-y-1/2 bg-line"
               style={{ left: '25%' }}
@@ -198,7 +202,7 @@ export function BalanceHero({ stats, onSettle }: Props) {
               USMAN
               {!square && balance < 0 && <ArrowLeft className="size-3 text-gold" />}
             </span>
-            <span className="flex items-center gap-1.5 text-cream-dim/60">
+            <span className="flex items-center gap-1.5 text-cream-dim/80">
               <Scale className="size-3" /> EVEN
             </span>
             <span className="flex items-center gap-2">
@@ -240,7 +244,7 @@ export function BalanceHero({ stats, onSettle }: Props) {
           <button
             onClick={() => (open ? setOpen(false) : openSettle())}
             disabled={square && !open}
-            className="group flex items-center justify-center gap-2.5 border border-gold bg-gold px-6 py-3 font-mono text-[11px] font-bold tracking-[0.24em] text-ink transition-all hover:bg-gold-soft disabled:cursor-not-allowed disabled:border-line disabled:bg-paper disabled:text-cream-dim"
+            className="lift group flex items-center justify-center gap-2.5 border border-gold bg-gold px-6 py-3 font-mono text-[11px] font-bold tracking-[0.24em] text-ink hover:bg-gold-soft disabled:cursor-not-allowed disabled:border-line disabled:bg-paper disabled:text-cream-dim"
           >
             {open ? <X className="size-4" /> : <HandCoins className="size-4" strokeWidth={2} />}
             {open ? 'CANCEL' : 'RECORD SETTLEMENT'}
@@ -280,7 +284,7 @@ export function BalanceHero({ stats, onSettle }: Props) {
                       min={0}
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-transparent font-mono text-sm font-semibold tabular-nums outline-none placeholder:text-cream-dim/50"
+                      className="w-full bg-transparent font-mono text-sm font-semibold tabular-nums outline-none placeholder:text-cream-dim/70"
                       placeholder="0"
                     />
                   </div>
@@ -289,7 +293,7 @@ export function BalanceHero({ stats, onSettle }: Props) {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="note — optional"
-                    className="flex-1 border border-line bg-card px-4 py-3 font-mono text-xs outline-none placeholder:text-cream-dim/50 focus:border-gold/60"
+                    className="flex-1 border border-line bg-card px-4 py-3 font-mono text-xs outline-none placeholder:text-cream-dim/70 focus:border-gold/60"
                   />
                   <button
                     onClick={submitSettle}

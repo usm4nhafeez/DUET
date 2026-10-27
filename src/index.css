@@ -1,26 +1,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 
-@theme {
+@theme inline {
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Instrument Serif", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  --color-ink: #0b0906;
-  --color-ink-2: #12100b;
-  --color-paper: #171410;
-  --color-card: #14110c;
-  --color-cream: #f3ecdc;
-  --color-cream-dim: #a89e88;
-  --color-line: #2a251c;
-  --color-gold: #f0b84a;
-  --color-gold-soft: #ffce7a;
-  --color-ember: #e2693c;
-  --color-sage: #8fa37c;
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-cream: var(--cream);
+  --color-cream-dim: var(--cream-dim);
+  --color-line: var(--line);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-ember: var(--ember);
+  --color-sage: var(--sage);
 }
 
+/* dark is the house style; light inverts the paper/ink relationship */
 :root {
+  --ink: #0b0906;
+  --ink-2: #12100b;
+  --paper: #171410;
+  --card: #14110c;
+  --cream: #f3ecdc;
+  --cream-dim: #c2b69c;
+  --line: #37311f;
+  --gold: #f0b84a;
+  --gold-soft: #ffce7a;
+  --ember: #ef7a4d;
+  --sage: #9db389;
+  --stroke-word: rgba(243, 236, 220, 0.08);
+  --grain-op: 0.05;
+  --glow: rgba(240, 184, 74, 0.35);
   color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --ink: #f4efe2;
+  --ink-2: #eae3d0;
+  --paper: #fbf7ec;
+  --card: #fffdf6;
+  --cream: #1b1710;
+  --cream-dim: #77705e;
+  --line: #dcd3ba;
+  --gold: #b47a12;
+  --gold-soft: #96660c;
+  --ember: #c14f24;
+  --sage: #5f7a4e;
+  --stroke-word: rgba(27, 23, 16, 0.1);
+  --grain-op: 0.035;
+  --glow: rgba(180, 122, 18, 0.22);
+  color-scheme: light;
 }
 
 html {
@@ -32,12 +65,20 @@ body {
   color: var(--color-cream);
   font-family: var(--font-display);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  /* clip, not hidden: hidden failed to stop touch-panning on some mobile browsers,
+     and an overflow-x guard on <html> would kill the sticky header */
+  overflow-x: clip;
 }
 
 ::selection {
   background: var(--color-gold);
   color: var(--color-ink);
+}
+
+/* theme swap fade (Tailwind's own transition-* classes still win where set) */
+body,
+body * {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
 }
 
 /* ---------- scrollbars ---------- */
@@ -57,7 +98,7 @@ body {
   z-index: 60;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.05;
+  opacity: var(--grain-op);
   animation: grain-shift 0.9s steps(4) infinite;
 }
 @keyframes grain-shift {
@@ -92,6 +133,28 @@ body {
 }
 .marker-pulse { animation: marker-pulse 2.2s ease-out infinite; }
 
+/* ---------- card lift ---------- */
+:root {
+  --lift-shadow: 0 10px 30px rgba(0, 0, 0, 0.38);
+}
+:root[data-theme="light"] {
+  --lift-shadow: 0 10px 26px rgba(93, 77, 44, 0.16);
+}
+.lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.35s ease,
+    color 0.35s ease, border-color 0.35s ease;
+}
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--lift-shadow);
+}
+
+/* ---------- keyboard focus ---------- */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
 /* ---------- inputs ---------- */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
@@ -99,11 +162,10 @@ input[type="number"]::-webkit-inner-spin-button {
   margin: 0;
 }
 input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
-input[type="datetime-local"] { color-scheme: dark; }
 
 /* ---------- outline word backdrop ---------- */
 .outline-word {
-  -webkit-text-stroke: 1px rgba(243, 236, 220, 0.08);
+  -webkit-text-stroke: 1px var(--stroke-word);
   color: transparent;
   user-select: none;
 }

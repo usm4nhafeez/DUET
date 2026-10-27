@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { MoonStar, Wallet } from 'lucide-react';
 import type { LedgerStats } from '../lib/types';
 import { fmtMoney, fmtNum } from '../lib/format';
@@ -11,23 +10,17 @@ function Tile({
   value,
   sub,
   accent = false,
-  delay = 0,
 }: {
   label: string;
   icon: React.ReactNode;
   value: number;
   sub: string;
   accent?: boolean;
-  delay?: number;
 }) {
   const v = useAnimatedNumber(value);
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ delay }}
-      className={`group border border-line p-5 transition-colors ${
+    <div
+      className={`group lift border border-line p-5 ${
         accent ? 'bg-gold/10 hover:bg-gold/15' : 'bg-card hover:bg-paper'
       }`}
     >
@@ -42,8 +35,8 @@ function Tile({
       >
         {fmtNum(v)}
       </p>
-      <p className="mt-2 font-mono text-[10px] text-cream-dim">{sub}</p>
-    </motion.div>
+      <p className="mt-2 font-mono text-[11px] text-cream-dim">{sub}</p>
+    </div>
   );
 }
 
@@ -52,14 +45,13 @@ export function StatsGrid({ stats }: { stats: LedgerStats }) {
     stats.grandTotal > 0 ? `${Math.round((n / stats.grandTotal) * 100)}% of spend` : 'nothing yet';
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div data-reveal="stagger" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       <Tile
         label="GRAND TOTAL"
         icon={<Wallet className="size-4" strokeWidth={1.75} />}
         value={stats.grandTotal}
         sub={`${stats.meals} meals · avg ${fmtMoney(stats.meals ? stats.grandTotal / stats.meals : 0)}`}
         accent
-        delay={0}
       />
       <Tile
         label="USMAN PAID"
@@ -70,7 +62,6 @@ export function StatsGrid({ stats }: { stats: LedgerStats }) {
         }
         value={stats.usmanPaid}
         sub={pct(stats.usmanPaid)}
-        delay={0.05}
       />
       <Tile
         label="FASI PAID"
@@ -81,14 +72,12 @@ export function StatsGrid({ stats }: { stats: LedgerStats }) {
         }
         value={stats.fasiPaid}
         sub={pct(stats.fasiPaid)}
-        delay={0.1}
       />
       <Tile
         label="NIGHT / BREAK"
         icon={<MoonStar className="size-4" strokeWidth={1.75} />}
         value={stats.nights}
         sub={`${stats.nights} night runs · ${stats.breaks} breaks · ${fmtMoney(stats.settledAmount)} settled`}
-        delay={0.15}
       />
     </div>
   );

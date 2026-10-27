@@ -66,7 +66,7 @@ export function JsonPanel({ entries, onImport, onClear }: Props) {
     'flex items-center justify-center gap-2 border border-line bg-paper px-3 py-2.5 font-mono text-[10px] font-semibold tracking-[0.18em] text-cream-dim transition-colors hover:border-gold/50 hover:text-gold';
 
   return (
-    <section className="border border-line bg-card">
+    <section data-reveal className="border border-line bg-card">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
         <p className="flex items-center gap-2.5 font-mono text-[11px] font-semibold tracking-[0.28em]">
           <Braces className="size-4 text-gold" strokeWidth={1.75} />
@@ -112,7 +112,7 @@ export function JsonPanel({ entries, onImport, onClear }: Props) {
             {json}
           </pre>
         )}
-        <p className="mt-3 pb-1 font-mono text-[9px] leading-relaxed tracking-[0.12em] text-cream-dim/60">
+        <p className="mt-3 pb-1 font-mono text-[9px] leading-relaxed tracking-[0.12em] text-cream-dim/80">
           MIRROR OF YOUR LEDGER — ALSO AUTO-WRITTEN TO YOUR LINKED JSON FILE ON DISK. IMPORTING OR
           WIPING HERE SYNCES TO THE FILE TOO.
         </p>

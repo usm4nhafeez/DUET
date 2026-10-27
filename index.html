@@ -9,6 +9,12 @@
       content="DUET — a two-person meal ledger for Usman & Fasi. Track break-time and night meals, who paid what, and who owes whom. Stored as JSON."
     />
     <title>DUET — Usman × Fasi Meal Ledger</title>
+    <script>
+      // set theme before first paint so there is no flash
+      document.documentElement.dataset.theme =
+        localStorage.getItem('duet-theme') ||
+        (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    </script>
   </head>
   <body>
     <div id="root"></div>

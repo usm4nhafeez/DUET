@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Database } from 'lucide-react';
 import type { Entry, Slot, Split } from './lib/types';
 import { computeStats } from './lib/types';
@@ -65,10 +67,47 @@ export default function App() {
     }
   }, [entries, booted, dbLive]);
 
+  /* GSAP scroll reveals — every [data-reveal] section on the page;
+     data-reveal="stagger" animates its children one by one */
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    gsap.registerPlugin(ScrollTrigger);
+    const ctx = gsap.context(() => {
+      gsap.from('header', { yPercent: -100, duration: 0.8, ease: 'power3.out' });
+      gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el) => {
+        const targets =
+          el.dataset.reveal === 'stagger' ? Array.from(el.children) : [el];
+        gsap.from(targets, {
+          opacity: 0,
+          y: 26,
+          duration: 0.65,
+          ease: 'power3.out',
+          stagger: 0.09,
+          scrollTrigger: { trigger: el, start: 'top 92%', once: true },
+        });
+      });
+      /* hero depth — backdrop word and glow drift as you scroll away */
+      gsap.to('.outline-word', {
+        y: 90,
+        ease: 'none',
+        scrollTrigger: { trigger: 'main > section', start: 'top top', end: 'bottom top', scrub: true },
+      });
+      gsap.to('[data-hero-glow]', {
+        y: 140,
+        opacity: 0.08,
+        ease: 'none',
+        scrollTrigger: { trigger: 'main > section', start: 'top top', end: 'bottom top', scrub: true },
+      });
+    });
+    return () => ctx.revert();
+    // re-scan once boot flips the banner — that section mounts after the first pass
+  }, [dbLive]);
+
   /* real JSON file on disk — auto-save + auto-restore */
   const fileSync = useFileSync(entries, setEntries);
 
   const stats = useMemo(() => computeStats(entries), [entries]);
+  const squareBalance = Math.abs(stats.balance) < 0.01;
 
   const addMeal = (meal: {
     at: string;
@@ -92,6 +131,9 @@ export default function App() {
   };
 
   const removeEntry = (id: string) => setEntries((prev) => prev.filter((e) => e.id !== id));
+  /* edit a logged entry — same setEntries path, so the debounced /api/ledger push + disk file sync pick it up automatically */
+  const updateEntry = (next: Entry) =>
+    setEntries((prev) => prev.map((e) => (e.id === next.id ? next : e)));
   const clearAll = () => setEntries([]);
   const importAll = (list: Entry[]) => setEntries(list);
 
@@ -105,7 +147,7 @@ export default function App() {
         {/* sync status — the ledger .json file */}
         <div className="mx-auto max-w-7xl space-y-3 px-4 pt-6 sm:px-6">
           {dbLive ? (
-            <section className="flex items-center gap-3.5 border border-sage/40 bg-card px-5 py-4">
+            <section data-reveal className="flex items-center gap-3.5 border border-sage/40 bg-card px-5 py-4">
               <span className="grid size-10 shrink-0 place-items-center border border-sage/50 bg-sage/10 text-sage">
                 <Database className="size-4.5" strokeWidth={1.75} />
               </span>
@@ -126,7 +168,8 @@ export default function App() {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-          <div className="grid items-start gap-6 lg:grid-cols-12">
+          {/* grid-cols-1 = minmax(0,1fr) tracks; implicit auto tracks would floor each column at its min-content and push the page wide on phones */}
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
             {/* left column — form + stats */}
             <div className="space-y-6 lg:col-span-5">
               <MealForm onAdd={addMeal} />
@@ -137,13 +180,17 @@ export default function App() {
             <div className="space-y-6 lg:col-span-7">
               <StatsGrid stats={stats} />
               <div id="ledger" className="scroll-mt-24">
-                <History entries={entries} onDelete={removeEntry} />
+                <History entries={entries} onDelete={removeEntry} onUpdate={updateEntry} />
               </div>
             </div>
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer
+        mood={Math.max(20, Math.min(100, squareBalance ? 100 : 100 - Math.abs(stats.balance) / 8))}
+        waveKey={entries.length}
+        balance={stats.balance}
+      />
     </div>
   );
 }
