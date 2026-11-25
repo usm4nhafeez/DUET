@@ -1,7 +1,6 @@
 import { UtensilsCrossed } from 'lucide-react';
-import { Mascot } from './Mascot';
 
-export function Footer({ mood, waveKey, balance }: { mood: number; waveKey: number; balance: number }) {
+export function Footer() {
   return (
     <footer data-reveal className="border-t border-line">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-10 sm:flex-row sm:px-6">
@@ -11,8 +10,7 @@ export function Footer({ mood, waveKey, balance }: { mood: number; waveKey: numb
           </span>
           <span className="font-display text-sm font-bold tracking-[0.22em]">DUET</span>
         </p>
-        <Mascot mood={mood} waveKey={waveKey} balance={balance} />
-        <p className="text-center font-serif text-xl italic text-cream-dim">
+        <p className="flex-1 text-center font-serif text-xl italic text-cream-dim">
           built for two hungry friends — usman &amp; fasi
         </p>
         <p className="font-mono text-[9px] tracking-[0.24em] text-cream-dim/80">

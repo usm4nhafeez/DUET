@@ -107,7 +107,6 @@ export default function App() {
   const fileSync = useFileSync(entries, setEntries);
 
   const stats = useMemo(() => computeStats(entries), [entries]);
-  const squareBalance = Math.abs(stats.balance) < 0.01;
 
   const addMeal = (meal: {
     at: string;
@@ -186,11 +185,7 @@ export default function App() {
           </div>
         </div>
       </main>
-      <Footer
-        mood={Math.max(20, Math.min(100, squareBalance ? 100 : 100 - Math.abs(stats.balance) / 8))}
-        waveKey={entries.length}
-        balance={stats.balance}
-      />
+      <Footer />
     </div>
   );
 }

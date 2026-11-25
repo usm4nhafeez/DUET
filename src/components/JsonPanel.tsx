@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Braces, Check, Copy, Download, Eraser, Upload } from 'lucide-react';
 import type { Entry } from '../lib/types';
 import { parseImported, toJson } from '../lib/store';
@@ -15,7 +15,7 @@ export function JsonPanel({ entries, onImport, onClear }: Props) {
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const json = toJson(entries);
+  const json = useMemo(() => toJson(entries), [entries]);
 
   const copy = async () => {
     try {

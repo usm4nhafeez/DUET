@@ -8,7 +8,7 @@ const ITEMS = [
 ];
 
 export function Marquee() {
-  const row = [...ITEMS, ...ITEMS];
+  const row = ITEMS;
   return (
     <div data-reveal className="overflow-hidden border-y border-line bg-ink-2 py-3">
       <div className="marquee-track flex w-max items-center">

@@ -5,7 +5,6 @@ import type { LedgerStats, Person } from '../lib/types';
 import { PEOPLE } from '../lib/types';
 import { fmtMoney, fmtNum } from '../lib/format';
 import { useAnimatedNumber } from '../lib/useAnimatedNumber';
-import { HeroBackground } from './HeroBackground';
 
 interface Props {
   stats: LedgerStats;
@@ -92,8 +91,6 @@ export function BalanceHero({ stats, onSettle }: Props) {
 
   return (
     <section className="relative overflow-hidden border-b border-line">
-      {/* three.js gold dust — sits under the glow and all content */}
-      <HeroBackground />
       {/* ambient glow + backdrop word */}
       <div
         data-hero-glow

@@ -24,13 +24,13 @@ const SPLITS: { key: Split; label: string }[] = [
 ];
 
 export function MealForm({ onAdd }: Props) {
-  const now = useNow(1000);
+  const [timeMode, setTimeMode] = useState<'auto' | 'manual'>('auto');
+  const now = useNow(timeMode === 'auto' ? 1000 : 60000);
   const h = now.getHours();
   const suggestedSlot: Slot = h >= 5 && h < 17 ? 'break' : 'night';
 
   const [slot, setSlot] = useState<Slot>(suggestedSlot);
   const [slotTouched, setSlotTouched] = useState(false);
-  const [timeMode, setTimeMode] = useState<'auto' | 'manual'>('auto');
   const [manualDT, setManualDT] = useState(toLocalInputValue(new Date()));
   const [usmanAmt, setUsmanAmt] = useState('');
   const [fasiAmt, setFasiAmt] = useState('');
